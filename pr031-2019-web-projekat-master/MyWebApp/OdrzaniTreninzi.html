@@ -1,0 +1,299 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            loadPoseceniTreninzi();
+            
+
+            $(document).on('click', '.pregled', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "POST",
+                    url: "/api/pregledtreninga",
+                    data: { value: id }, 
+                    success: function (data) {
+                        //gtabela(data);
+                    }
+                });
+                window.location = "/PregledTreninga.html";
+            });
+
+
+
+            $(document).on('click', '.posetioci', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "GET",
+                    url: "/api/posetioci",
+                    data: { value: id }, 
+                    success: function (data) {
+                        tabelaP(data);
+                    },
+                });
+                // window.location = "/Posetioci.html";
+            });
+
+            function tabelaP(data) {
+                let table;
+                if (data.length == 0) {
+                    table = '<p>Nema posetioca na treningu!</p>';
+                } else {
+
+                    table = '<table border="1" class="tFC">';
+                    var type;
+                    var item = '<tr><td>Korisničko ime</td><td>Ime</td><td>Prezime</td>';
+                    item += '</tr>';
+
+                    for (element in data) {
+                        item += '<tr><td>' + data[element].KorisnickoIme + '</td><td>' + data[element].Ime + '</td><td>' + data[element].Prezime + '</td></tr>';
+                    }
+                    table += item;
+
+                    table += '</table>';
+                }
+                $('#posetioci').html(table);
+            }
+
+           
+            function loadPoseceniTreninzi() {
+                let id = $(this).attr('name');
+                $.ajax({
+                    url: "/api/trener/get",
+                    type: "GET",
+                    data: { value: id },
+                    success: function (data) {
+                        tebelaPoseceniTreninzi(data);
+                    }
+                });
+            }
+
+            function tebelaPoseceniTreninzi(data) {
+                let table;
+                table = '<p>Nema podataka za prikaz. Ulogujte se da biste videli!</p>';
+                var logged = Ulogovan();
+                var typeUser = Uloga()
+               // var ki = KorisnickoIme()
+                if (logged == true && typeUser == '1') {
+                    if (data.length == 0) {
+                        table = '<p>Još uvek niste održali nijedan trening!</p>';
+                    } else {
+                        table = '<table border="1" class="tFC">';
+                        var type;
+                        var item = '<tr><td>Naziv</td><td>Fitnes centar</td><td>Tip</td><td>Trajanje</td><td>Datum i vreme</td><td>Maksimalan broj posetilaca</td><td>Broj prijavljenih</td>';
+                        item += '</tr>';
+                        for (element in data) {
+                            if (data[element].Tip == 0) {
+                                type = "YOGA";
+                            } else if (data[element].Tip == 1) {
+                                type = "LES MILLS TONE";
+                            } else if (data[element].Tip == 2) {
+                                type = "BODY PUMP";
+                            }
+                            item += '<tr><td>' + data[element].Naziv + '</td><td>' + data[element].FCentar.Naziv + '</td><td>' + type + '</td><td>' + data[element].Trajanje + '</td><td>' + data[element].DatumVreme + '</td><td>' + data[element].MaksimalanBrPosetilaca + '</td><td>' + data[element].Posetioci.length + '</td>';
+                            // item += '<td><button  id="prijavise" class="btnDetails" name="' + data[element].FCentar.Id + '>Ostavi komentar</button></td>';
+                            // <td><button id="prijavise" class="btnDetails" name="' + data[element].Id + '">Prijavi se</button></td>
+                            item += '<td><button class="pregled" name="' + data[element].Id + '">Pregled treninga</button></td>';
+                            item += '<td><button class="posetioci" name="' + data[element].Id + '">Posetioci</button></td>';
+                            item += '</tr>';
+                        }
+                        table += item;
+
+                        table += '</table>';
+                    }
+                }
+                $('#prethodnitreninzi').html(table);
+            }
+
+            function Ulogovan() {
+                var o
+                $.ajax({
+                    url: "/api/Islogged",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        o = data
+                    }
+
+                });
+                return o;
+            }
+
+            function Uloga() {
+                var o
+                $.ajax({
+                    url: "/api/uloga",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        o = data
+                    }
+                });
+                return o;
+            }
+
+            $("#formPretraga").submit(function (e) {
+                e.preventDefault(); 
+                var form = $(this);
+                $.ajax({
+                    type: "POST",
+                    url: "/api/pretragatreningatrener",
+                    data: form.serialize(),
+                    success: function (data) {
+                        tebelaPoseceniTreninzi(data);
+                    }
+                });
+            });
+
+            $("#formSort").submit(function (e) {
+                e.preventDefault(); 
+                var form = $(this);
+                $.ajax({
+                    type: "POST",
+                    url: "/api/sorttrener",
+                    data: form.serialize(), 
+                    success: function (data) {
+                        tebelaPoseceniTreninzi(data);
+                    }
+                });
+            });
+
+            $("#formKombinovana").submit(function (e) {
+                e.preventDefault(); 
+                var form = $(this);
+                $.ajax({
+                    type: "POST",
+                    url: "/api/mixtrener",
+                    data: form.serialize(), 
+                    success: function (data) {
+                        tebelaPoseceniTreninzi(data);
+                    }
+                });
+            });
+
+        });
+    </script>
+    <style>
+        #tFC {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .container .box {
+            width: 540px;
+            margin: 50px;
+            display: table;
+        }
+
+            .container .box .box-row {
+                display: table-row;
+            }
+
+            .container .box .box-cell {
+                display: table-cell;
+                width: 70%;
+                padding: 20px;
+            }
+
+                .container .box .box-cell.box1 {
+                    text-align: justify;
+                }
+
+                .container .box .box-cell.box2 {
+                    text-align: justify
+                }
+
+                .container .box .box-cell.box3 {
+                    text-align: justify;
+                }
+    </style>
+</head>
+<body>
+    <h3>Treninzi koje ste održali</h3>
+    <div id="prethodnitreninzi"></div>
+    <hr />
+    <div id="posetioci"></div>
+    <hr />
+    <div class="container">
+        <div class="box">
+            <div class="box-row">
+                <div id="pretraga" class="box-cell box1">
+                    <form id="formPretraga">
+
+                        <table class="tFC">
+                            <tr>
+                                <td>Pretražite po: </td>
+                                <td>
+                                    <select name="pretragaSelect" id="pretragaSelectId">
+                                        <option>Nazivu</option>
+                                        <option>Tipu treninga</option>
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Pretraga</td>
+                                <td><input type="text" name="pretragaInput" /></td>
+                            </tr>
+                            
+                        </table>
+                        <input type="submit" value="Pretraga" />
+                    </form>
+                </div>
+                <div class="box-cell box2">
+                    <form id="formKombinovana">
+                        <table>
+                            <tr>
+                                <td>Naziv</td>
+                                <td><input type="text" name="Naziv" /></td>
+                            </tr>
+                            <tr>
+                                <td>Tip treninga</td>
+                                <td><input type="text" name="tiptreninga" /></td>
+                            </tr>
+                            
+                            <tr>
+                                <td colspan="2"><input type="submit" value="Pretraga" /></td>
+                            </tr>
+                        </table>
+
+                    </form>
+                </div>
+                <div class="box-cell box3">
+                    <form id="formSort">
+                        <select name="sortSelect" id="sortSelectId">
+                            <option>Naziv</option>
+                            <option>Tip treninga</option>
+                            
+                        </select>
+                        <table>
+                            <tr>
+                                <td><input type="radio" name="rb" value="opadajuce" id="o" /></td>
+                                <td>opadajuće</td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="rb" value="rastuce" id="r" /></td>
+                                <td>rastuće</td>
+                            </tr>
+                        </table>
+                        <input type="submit" value="Sortiraj" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+</body>
+</html>

@@ -1,0 +1,262 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            loadInfo();
+            loadTreninzi();
+            function loadInfo() {
+                $.ajax({
+                    url: "/api/pregledprofila",
+                    type: "GET",
+                    success: function (data) {
+                        tabela(data);
+                    }
+                });
+            }
+
+            $(document).on('click', '.pregled', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "POST",
+                    url: "/api/pregledtreninga",
+                    data: { value: id }, 
+                    success: function (data) {
+                        //gtabela(data);
+                    }
+                });
+                window.location = "/PregledTreninga.html";
+            });
+
+
+            $(document).on('click', '.brisanje', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "DELETE",
+                    url: "/api/brisanjetreninga",
+                    data: { value: id }, 
+                    success: function (data) {
+                        if (data == true) {
+                            alert("Uspešno ste obrisali trening!");
+                            tebelaPoseceniTreninzi(data);
+                        } else {
+                            alert("Ne možete da izbrišete trening jer ima prijavljenih korsinika!");
+                        }
+
+
+                    }, error: function (data) {
+                        alert("Ne možete da izbrišete trening jer ima prijavljenih korsinika!");
+                       // window.location = "/TrenerPregled.html";
+                    }
+                });
+               // window.location = "/details.html";
+            });
+
+            $(document).on('click', '.posetioci', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "GET",
+                    url: "/api/posetioci",
+                    data: { value: id }, 
+                    success: function (data) {
+                        tabelaP(data);
+                    },
+                });
+               // window.location = "/Posetioci.html";
+            });
+
+            function tabelaP(data) {
+                let table;
+                if (data.length == 0) {
+                    table = '<p>Nema posetioca na treningu!</p>';
+                } else {
+
+                    table = '<table class="tFC" border="1">';
+                    var type;
+                    var item = '<tr><td>Korisničko ime</td><td>Ime</td><td>Prezime</td>';
+                    item += '</tr>';
+
+                    for (element in data) {
+                        item += '<tr><td>' + data[element].KorisnickoIme + '</td><td>' + data[element].Ime + '</td><td>' + data[element].Prezime + '</td></tr>';
+                    }
+                    table += item;
+
+                    table += '</table>';
+                }
+                $('#posetioci').html(table);
+            }
+
+            $(document).on('click', '.izmena', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "POST",
+                    url: "/api/pregledtreninga",
+                    data: { value: id },
+                    success: function (data) {
+                        tabelaP(data);
+                    },
+                });
+                window.location = "/IzmenaTreninga.html";
+            });
+
+            function loadTreninzi() {
+                $.ajax({
+                    url: "/api/predstojecitreninzit/get",
+                    type: "GET",
+                    success: function (data) {
+                        tabelaTreninzi(data);
+                    }
+                });
+            }
+
+
+
+            function tabelaTreninzi(data) {
+                let table;
+                if (data.length == 0) {
+                    table = '<p>Nema planiranih treninga za naredni period!</p>';
+                } else {
+
+                    table = '<table border="1" class="tFC">';
+                    var type;
+                    var item = '<tr><td>Naziv</td><td>Tip</td><td>Trajanje</td><td>Datum i vreme</td><td>Maksimalan broj posetilaca</td><td>Broj prijavljenih</td>';
+                    item += '</tr>';
+
+                    for (element in data) {
+                        if (data[element].Tip == 0) {
+                            type = "YOGA";
+                        } else if (data[element].Tip == 1) {
+                            type = "LES MILLS TONE";
+                        } else if (data[element].Tip == 2) {
+                            type = "BODY PUMP"
+                        }
+
+                        var logged = Ulogovan();
+                        var typeUser = Uloga()
+                        if (logged == true && typeUser == '1') {
+                            item += '<tr><td>' + data[element].Naziv + '</td><td>' + type + '</td><td>' + data[element].Trajanje + '</td><td>' + data[element].DatumVreme + '</td><td>' + data[element].MaksimalanBrPosetilaca + '</td><td>' + data[element].Posetioci.length ;
+                            item += '<td><button class="posetioci" name="' + data[element].Id + '">Posetioci</button></td>';
+                            item += '<td><button class="brisanje" name="' + data[element].Id + '">Obrišite trening</button></td>';
+                            item += '<td><button class="pregled" name="' + data[element].Id + '">Pregled treninga</button></td>';
+                            item += '<td><button class="izmena" name="' + data[element].Id + '">Izmena treninga</button></td></tr>';
+                        }
+                        else {
+                            item += '<tr><td>' + data[element].Naziv + '</td><td>' + type + '</td><td>' + data[element].Trajanje + '</td><td>' + data[element].DatumVreme + '</td><td>' + data[element].MaksimalanBrPosetilaca + '</td><td>' + data[element].Posetioci.length + '</td></tr>';
+                        }
+                    }
+                    table += item;
+
+                    table += '</table>';
+                }
+                $('#predtojecitreninzi').html(table);
+            }
+
+
+            function Ulogovan() {
+                var o
+                $.ajax({
+                    url: "/api/Islogged",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        o = data
+                    }
+
+                });
+                return o;
+            }
+
+            function Uloga() {
+                var o
+                $.ajax({
+                    url: "/api/uloga",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        o = data
+                    }
+                });
+                return o;
+            }
+
+            function KorisnickoIme() {
+                var ki
+                $.ajax({
+                    url: "/api/ulogovankorisnik",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        ki = data
+                    }
+                });
+                return ki;
+            }
+
+            function tabela(data) {
+                let table = '<table border="1" class="tFC">';
+                let item = '<tr><td>Korisničko ime</td><td>' + data.KorisnickoIme + '</td></tr>';
+                item += '<tr><td>Lozinka</td><td>' + data.Lozinka + '</td></tr>';
+                item += '<tr><td>Ime</td><td>' + data.Ime + '</td></tr>';
+                item += '<tr><td>Prezime</td><td>' + data.Prezime + '</td></tr>';
+                if (data.PolKorisnika == 0)
+                    item += '<tr><td>Pol</td><td>' + 'Muški' + '</td></tr>';
+                else
+                    item += '<tr><td>Pol</td><td>' + 'Ženski' + '</td></tr>';
+                item += '<tr><td>Email</td><td>' + data.Email + '</td></tr>';
+                item += '<tr><td>Datum rođenja</td><td>' + data.DatumRodjenja + '</td></tr>';
+                if (data.Uloga == 0)
+                    item += '<tr><td>Uloga</td><td>' + 'Posetilac' + '</td></tr>';
+                else if (data.Uloga == 1)
+                    item += '<tr><td>Uloga</td><td>' + 'Trener' + '</td></tr>';
+                else
+                    item += '<tr><td>Uloga</td><td>' + 'Vlasnik' + '</td></tr>';
+                item += '<tr><td>Id</td><td>' + data.Id + '</td</tr>';
+                table += item;
+                table += '</table>';
+                $('#informacije').html(table);
+            }
+
+
+
+
+        });
+    </script>
+    <style>
+
+        #tFC {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+    </style>
+</head>
+<body>
+    <h3>Pregled profila</h3>
+    <div id="informacije"></div>
+    <hr />
+    <a href="/OdrzaniTreninzi.html">Održani treninzi</a>
+    <hr />
+    <h3>Predstojeći treninzi</h3>
+    <div id="predtojecitreninzi"></div>
+    <hr />
+   
+    <div id="posetioci"></div>
+    <hr />
+    <a href="/AddTr.html">Kreiraj trening</a>
+    <a href="/Index.html">Početna</a>
+
+</body>
+</html>

@@ -1,0 +1,122 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+
+            $("#formRegister").submit(function (e) {
+                e.preventDefault();
+                let ki = $('#KorisnickoIme').val();
+                if (ki.length == 0) {
+                    alert("Morate uneti korisnicko ime!");
+                    return;
+                }
+                let Lozinka = $('#Lozinka').val();
+                if (Lozinka.length == 0) {
+                    alert("Morate uneti lozinku!");
+                    return;
+                }
+                let Ime = $('#Ime').val();
+                if (Ime.length == 0) {
+                    alert("Morate uneti ime!");
+                    return;
+                }
+                let Prezime = $('#Prezime').val();
+                if (Prezime.length == 0) {
+                    alert("Morate uneti prezime!");
+                    return;
+                }
+                let Email = $('#Email').val();
+                if (Email.length == 0) {
+                    alert("Morate uneti email!");
+                    return;
+                }
+                let DatumRodjenja = $('#DatumRodjenja').val();
+                if (DatumRodjenja.length == 0) {
+                    alert("Morate uneti datum!");
+                    return;
+                }
+                var form = $(this);
+                $.ajax({
+                    type: "POST",
+                    url: "/api/register",
+                    async: false,
+                    data: form.serialize(), 
+                    success: function (data) {
+                        alert("Uspesno ste se registrovali!");
+                        window.location = "/Index.html";
+                    }, error: function (data) {
+                        alert("Ne mozete da se registrujete!");
+                        window.location = "/Registracija.html";
+                    }
+                });
+            });
+        });
+
+    </script>
+    <style>
+        #tFC {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head >
+    <body>
+        <h1>Registracija</h1>
+        <form id="formRegister">
+            <table>
+                <tr>
+                    <td>Korisnicko ime: </td>
+                    <td><input type="text" name="KorisnickoIme" id="KorisnickoIme" /></td>
+                </tr>
+                <tr>
+                    <td>Lozinka: </td>
+                    <td><input type="password" name="Lozinka" id="Lozinka"/></td>
+                </tr>
+                <tr>
+                    <td>Ime: </td>
+                    <td><input type="text" name="Ime" id="Ime"/></td>
+                </tr>
+                <tr>
+                    <td>Prezime: </td>
+                    <td><input type="text" name="Prezime" id="Prezime"/></td>
+                </tr>
+                <tr>
+                    <td>Pol: </td>
+                    <td>
+                        <select name="PolKorisnika" id="PolKorisnika">
+                            <option>MUŠKI</option>
+                            <option>ŽENSKI</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Email: </td>
+                    <td><input type="text" name="Email" id="Email"/></td>
+                </tr>
+                <tr>
+                    <td>Datum rođenja: </td>
+                    <td><input type="date" name="DatumRodjenja" id="DatumRodjenja"/></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center"><input type="submit" id="btnRegistracija" value="Registruj se"></td>
+                </tr>
+            </table>
+
+        </form>
+    </body>
+</html>

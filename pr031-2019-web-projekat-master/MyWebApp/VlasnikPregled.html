@@ -1,0 +1,141 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            loadInfo();
+           // loadFC();
+            function loadInfo() {
+                $.ajax({
+                    url: "/api/pregledprofila",
+                    type: "GET",
+                    success: function (data) {
+                        tabela(data);
+                    }
+                });
+            }
+
+            function loadFC(idKorisnika) {
+                $.ajax({
+                    url: "/api/vlasnikfc",
+                    type: "GET",
+                    success: function (data) {
+                        tabela(data);
+                    }
+                });
+            }
+
+            function tabela(data) {
+                let tableOfFC = '<table border="1" class="tFC">';
+                tableOfFC += '<tr><th>Naziv</th><th>Adresa</th><th>Godina</th><th></th></tr>';
+                for (element in data) {
+                    let fc = '<td>' + data[element].Naziv + '</td>';
+                    fc += '<td>' + data[element].Adresa + '</td>';
+                    fc += '<td>' + data[element].GodinaOtvaranja + '</td><td>' + '<button class="btnDetails" name="' + data[element].Id + '">Detalji</button></td>';
+                    tableOfFC += '<tr>' + fc + '</tr>';
+                }
+                tableOfFC += '</table>';
+                $('#fcentri').html(tableOfFC);
+            }
+
+            function Ulogovan() {
+                var o
+                $.ajax({
+                    url: "/api/Islogged",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        o = data
+                    }
+
+                });
+                return o;
+            }
+
+            function Uloga() {
+                var o
+                $.ajax({
+                    url: "/api/uloga",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        o = data
+                    }
+                });
+                return o;
+            }
+
+            function KorisnickoIme() {
+                var ki
+                $.ajax({
+                    url: "/api/ulogovankorisnik",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        ki = data
+                    }
+                });
+                return ki;
+            }
+
+            function tabela(data) {
+                let table = '<table border="1" class="tFC">';
+                let item = '<tr><td>Korisničko ime</td><td>' + data.KorisnickoIme + '</td></tr>';
+                item += '<tr><td>Lozinka</td><td>' + data.Lozinka + '</td></tr>';
+                item += '<tr><td>Ime</td><td>' + data.Ime + '</td></tr>';
+                item += '<tr><td>Prezime</td><td>' + data.Prezime + '</td></tr>';
+                if (data.PolKorisnika == 0)
+                    item += '<tr><td>Pol</td><td>' + 'Muški' + '</td></tr>';
+                else
+                    item += '<tr><td>Pol</td><td>' + 'Ženski' + '</td></tr>';
+                item += '<tr><td>Email</td><td>' + data.Email + '</td></tr>';
+                item += '<tr><td>Datum rođenja</td><td>' + data.DatumRodjenja + '</td></tr>';
+                if (data.Uloga == 0)
+                    item += '<tr><td>Uloga</td><td>' + 'Posetilac' + '</td></tr>';
+                else if (data.Uloga == 1)
+                    item += '<tr><td>Uloga</td><td>' + 'Trener' + '</td></tr>';
+                else
+                    item += '<tr><td>Uloga</td><td>' + 'Vlasnik' + '</td></tr>';
+                item += '<tr><td>Id</td><td>' + data.Id + '</td</tr>';
+                table += item;
+                table += '</table>';
+                $('#informacije').html(table);
+            }
+
+
+
+
+        });
+    </script>
+    <style>
+
+
+        #tFC {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        
+    </style>
+
+</head>
+<body>
+    <div id="informacije"></div>
+    <hr />
+    <a href="/FCentri.html">Prikaži fitnes centre</a>
+    
+</body>
+</html>

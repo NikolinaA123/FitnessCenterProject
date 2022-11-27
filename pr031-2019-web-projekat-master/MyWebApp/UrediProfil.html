@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            
+            loadInfo();
+            function loadInfo() {
+                $.ajax({
+                    url: "/api/pregledprofila",
+                    type: "GET",
+                    success: function (data) {
+                        tabela(data);
+                    }
+                });
+            }
+
+            $(document).on('click', '#saveEdit', function () {
+                var form = $("#formIzmena");
+                let Lozinka = $('#Lozinka').val();
+                if (Lozinka.length == 0) {
+                    alert("Morate uneti lozinku!");
+                    return;
+                }
+                let Ime = $('#Ime').val();
+                if (Ime.length == 0) {
+                    alert("Morate uneti ime!");
+                    return;
+                }
+                let Prezime = $('#Prezime').val();
+                if (Prezime.length == 0) {
+                    alert("Morate uneti prezime!");
+                    return;
+                }
+                let Email = $('#Email').val();
+                if (Email.length == 0) {
+                    alert("Morate uneti email!");
+                    return;
+                }
+                let DatumRodjenja = $('#datePicker').val();
+                if (DatumRodjenja.length == 0) {
+                    alert("Morate uneti datum!");
+                    return;
+                }
+                $.ajax({
+                    type: "PUT",
+                    url: "/api/edit",
+                    async: false,
+                    data: form.serialize(),
+                    success: function (data) {
+                        alert("Profil je uspešno editovan!");
+                    }, error: function (data) {
+                        alert("Neuspešno editovanje profila!");
+                    }
+                });
+            })
+
+
+            function tabela(data) {
+                let table = '<form id="formIzmena">';
+                let item = '<table>';
+               // item+='<tr><td>Korisničko ime</td><td><input type="text" name="KorisnickoIme" value="' + data.KorisnickoIme + '" /></td></tr>';
+                item += '<tr><td>Lozinka</td><td><input type="text" id="Lozinka" name="Lozinka" value="' + data.Lozinka + '"/></td></tr>';
+                item += '<tr><td>Ime</td><td><input type="text" id="Ime" name="Ime" value="' + data.Ime + '"/></td></tr>';
+                item += '<tr><td>Prezime</td><td><input type="text" id="Prezime" name="Prezime" value="' + data.Prezime + '"/></td></tr>';
+                if (data.PolKorisnika == 0) {
+                    item += '<tr><td>Pol</td><td><select id="PolKorisnika"><option>' + 'Muški' + '</option>'
+                    item += '<option>Ženski</option></select></td></tr>';
+                }
+
+                else {
+                    item += '<tr><td>Pol</td><td><select id="PolKorisnika"><option>' + 'Ženski' + '</option>'
+                    item += '<option>Muški</option></select></td></tr>';
+                }
+                item += '<tr><td>Email</td><td><input type="text" name="Email" id="Email" value="' + data.Email + '"/></td></tr>';
+                item += '<tr><td>Datum rođenja</td><td><input id="datePicker" type="text" name="DatumRodjenja" value="' + data.DatumRodjenja + '"/></td></tr>';
+                item += '<tr><td colspan="2"><input type="submit" id="saveEdit" value="Sačuvaj izmene"/></td></tr></table>'
+                table += item
+                table += '</form>';
+                $('#content').html(table);
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Uredi profil</h1>
+    <div id="content"></div>
+    
+</body>
+</html>

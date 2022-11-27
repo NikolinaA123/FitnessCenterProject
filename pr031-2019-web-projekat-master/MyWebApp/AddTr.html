@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+
+            $("#formAdd").submit(function (e) {
+                e.preventDefault();
+                let n = $('#n').val();
+                if (n.length == 0) {
+                    alert("Morate uneti naziv!");
+                    return;
+                }
+                let tr = $('#tr').val();
+                if (tr.length == 0) {
+                    alert("Morate uneti trajanje!");
+                    return;
+                }
+                let dv = $('#dv').val();
+                if (dv.length == 0) {
+                    alert("Morate uneti datum i vreme!");
+                    return;
+                }
+                let mb = $('#mb').val();
+                if (mb.length == 0) {
+                    alert("Morate uneti maksimalan broj posetilaca!");
+                    return;
+                }
+                var form = $(this);
+                $.ajax({
+                    type: "POST",
+                    url: "/api/kreirajtrening",
+                    async: false,
+                    data: form.serialize(), 
+                    success: function (data) {
+                        alert("Uspesno ste dodali trening!");
+                        window.location = "/TrenerPregled.html";
+                    }, error: function (data) {
+                        alert("Ne mozete da dodate trening!");
+                        window.location = "/KreirajTrening.html";
+                    }
+                });
+            });
+        });
+
+    </script>
+    <style>
+        #tFC {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <form id="formAdd">
+        <table class="tFC">
+            <tr>
+                <td>Naziv</td>
+                <td><input type="text" id="n" name="naziv" /></td>
+            </tr>
+            <tr>
+                <td>Tip treninga</td>
+                <td>
+                    <select name="tip">
+                        <option>Yoga</option>
+                        <option>Les Mills Tone</option>
+                        <option>Body Pump</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Trajanje</td>
+                <td><input type="number" id="tr" name="trajanje" /></td>
+            </tr>
+            <tr>
+                <td>Datum i vreme</td>
+                <td><input type="datetime" name="datumvreme" id="dv" /></td>
+            </tr>
+            <tr>
+                <td>Maksimalan broj posetilaca</td>
+                <td><input type="number" name="maxbr" id="mb" /></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="submit" value="Dodaj" /></td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

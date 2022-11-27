@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+
+            $("#formKomentar").submit(function (e) {
+                e.preventDefault();
+                let n = $('#txt').val();
+                if (n.length == 0) {
+                    alert("Morate uneti tekst!");
+                    return;
+                }
+                var form = $(this);
+                $.ajax({
+                    type: "POST",
+                    url: "/api/posaljikomentar",
+                    async: false,
+                    data: form.serialize(), 
+                    success: function (data) {
+                        alert("Uspesno ste dodali komentar!");
+                        window.location = "/Index.html";
+                    }, error: function (data) {
+                        alert("Ne mozete da dodate komentar!");
+                        window.location = "/Komentar.html";
+                    }
+                });
+            });
+        });
+
+    </script>
+    <style>
+        #tFC {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h3>Ostavite komentar</h3>
+    <form id="formKomentar">
+        <table class="tFC">
+            <tr>
+                <td>Tekst komentara: </td>
+                <td><input type="text" name="tekstKomentara" id="txt"/></td>
+            </tr>
+            <tr>
+                <td>Ocena: </td>
+                <td><select name="ocena">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="submit" value="Komentarisi"/></td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

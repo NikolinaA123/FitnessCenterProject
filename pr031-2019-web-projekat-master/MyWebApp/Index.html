@@ -1,0 +1,296 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            loadFC();
+            function tabela(data) {
+                let tableOfFC = '<table id="tFC" border="1">';
+                tableOfFC += '<tr><th>Naziv</th><th>Adresa</th><th>Godina otvaranja</th><th></th></tr>';
+                for (element in data) {
+                    let fc = '<td>' + data[element].Naziv + '</td>';
+                    fc += '<td>' + data[element].Adresa + '</td>';
+                    fc += '<td>' + data[element].GodinaOtvaranja + '</td><td>' + '<button class="btnDetails" name="' + data[element].Id + '">Detalji</button></td>';
+                    tableOfFC += '<tr>' + fc + '</tr>';
+                }
+                tableOfFC += '</table>';
+                $('#content').html(tableOfFC);
+            }
+            function loadFC(idKorisnika) {
+                $.ajax({
+                    url: "/api/gym/get",
+                    type: "GET",
+                    success: function (data) {
+                        tabela(data);
+                    }
+                });
+            }
+            $("#formKombinovana").submit(function (e) {
+                e.preventDefault(); 
+                var form = $(this);
+                $.ajax({
+                    type: "POST",
+                    url: "/api/mix/miks",
+                    data: form.serialize(), 
+                    success: function (data) {
+                        tabela(data);
+                    }
+                });
+            });
+            $("#formPretraga").submit(function (e) {
+                e.preventDefault(); 
+                var form = $(this);
+                $.ajax({
+                    type: "POST",
+                    url: "/api/gym/pretrazi",
+                    data: form.serialize(), 
+                    success: function (data) {
+                        tabela(data);
+                    }
+                });
+            });
+
+            $("#formSort").submit(function (e) {
+                e.preventDefault(); 
+                var form = $(this);
+                $.ajax({
+                    type: "POST",
+                    url: "/api/sort/sortiranje",
+                    data: form.serialize(), 
+                    success: function (data) {
+                        tabela(data);
+                    }
+                });
+            });
+
+            $(document).on('click', '#odjava', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/odjava",
+                    success: function (data) {
+                        $('#user').hide();
+                        $('#regPr').show();
+                        window.location = "/Index.html";
+                    }
+                });
+            });
+
+
+            $(document).on('click', '#edit', function () {
+                window.location = "/UrediProfil.html";
+            });
+
+            $(document).on('click', '.btnDetails', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "POST",
+                    url: "/api/details",
+                    data: { value: id }, 
+                    success: function (data) {
+                        //gtabela(data);
+                    }
+                });
+                window.location = "/details.html";
+            });
+
+            Ulogovan();
+            function Ulogovan() {
+                $.ajax({
+                    url: "/api/Islogged",
+                    type: "GET",
+                    success: function (data) {
+                        if (data == true) {
+                            let res = '<button id="pregled" >Pregled profila</button>';
+                            //
+                           // res += '<a href="UrediProfil.html">Uredi profil</a>&nbsp;&nbsp;';
+                            res += '<button class="button" id="edit" >Uredi profil</button>';
+                            res += '<button class="button" id="odjava" >Odjava</button>';
+                            /*let res = '<a id="pregled" href="PregledProfila.html">Pregled profila</a>&nbsp;&nbsp;';
+                            res += '<a href="UrediProfil.html">Uredi profil</a>&nbsp;&nbsp;';
+                            res += '<a id="odjava" href="Index.html">Odjava</a>';*/
+                            $('#user').show();
+                            $('#regPr').hide();
+                            $('#user').html(res);
+                        } else {
+                            let res = '<p id="regPrp">';
+                            res += '<a href="Registracija.html">Registruj se</a>&ensp;';
+                            res += '<a href="Prijava.html">Prijavi se</a>';
+                            $('#user').hide();
+                            $('#regPrp').show();
+                            $('#regPrp').html(res);
+                        }
+                    }
+                });
+
+
+            }
+
+            $(document).on('click', '#pregled', function () {
+                $.ajax({
+                    url: "/api/uloga",
+                    type: "GET",
+                    success: function (data) {
+                        if (data == 0) {
+                            window.location = "/PregledProfila.html";
+                        } else if (data == 1) {
+                            window.location = "/TrenerPregled.html";
+                        } else if (data == 2) {
+                            window.location = "/VlasnikPregled.html";
+                        }
+                    }
+                });
+
+            });
+
+        });
+    </script>
+    <style>
+        h1 {
+            color: white;
+            text-shadow: 0px 1px 1px black, 0 0 5px blue, 0 0 0px darkblue;
+        }
+       
+       /* body {
+            background-color: #F5F5F5;
+        }*/
+       
+        #tFC {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            text-align: left;
+            padding: 5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .container .box {
+            width: 540px;
+            margin: 50px;
+            display: table;
+        }
+
+            .container .box .box-row {
+                display: table-row;
+            }
+
+            .container .box .box-cell {
+                display: table-cell;
+                width: 70%;
+                padding: 20px;
+            }
+
+                .container .box .box-cell.box1 {
+                   
+                    text-align: justify;
+                }
+
+                .container .box .box-cell.box2 {
+                    
+                    text-align: justify
+                }
+
+                .container .box .box-cell.box3 {
+                  
+                    text-align: justify;
+                }
+    </style>
+</head>
+<body>
+    <div id="index">
+        <p id="regPr">
+            <a href="Registracija.html">Registruj se</a>
+            &ensp;
+            <a href="Prijava.html">Prijavi se</a>
+        </p>
+        <div id="user"></div>
+        <h1>Fitnes centri</h1>
+        <div id="content"></div>
+        <hr />
+        <div class="container">
+            <div class="box">
+                <div class="box-row">
+                    <div class="box-cell box1">
+                        <h3>Pretražite fitnes centre</h3>
+                        <form id="formPretraga">
+                            <select name="pretragaSelect" id="pretragaSelectId">
+                                <option>Naziv</option>
+                                <option>Adresa</option>
+                                <option>Godina</option>
+                            </select>
+                            <table>
+                                <tr>
+                                    <td>Min godina</td>
+                                    <td><input type="number" name="minG" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Max godina</td>
+                                    <td><input type="number" name="maxG" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Pretraga</td>
+                                    <td><input type="text" name="pretragaInput" /></td>
+                                </tr>
+                            </table>
+                            <input class="button" type="submit" value="Pretraga" />
+                        </form>
+                    </div>
+                    &nbsp;
+                    <div class="box-cell box2"> 
+                        <h3>Kombinovana pretraga</h3>
+                        <form id="formKombinovana">
+                            <table>
+                                <tr>
+                                    <td>Naziv</td>
+                                    <td><input type="text" name="Naziv" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Adresa</td>
+                                    <td><input type="text" name="Adresa" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Godina</td>
+                                    <td><input type="number" name="Godina" /></td>
+                                </tr>
+                            </table>
+                            <input type="submit" class="button" value="Pretraga" />
+
+                        </form>
+                    </div>
+                    &nbsp;
+                    <div class="box-cell box3">
+                        <h3>Sortiranje</h3> 
+                        <form id="formSort">
+                            <select name="sortSelect" id="sortSelectId">
+                                <option>Naziv</option>
+                                <option>Adresa</option>
+                                <option>Godina</option>
+                            </select>
+                            <table>
+                                <tr>
+                                    <td><input type="radio" name="rb" value="opadajuce" id="o" /></td>
+                                    <td>opadajuće</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="radio" name="rb" value="rastuce" id="r" /></td>
+                                    <td>rastuće</td>
+                                </tr>
+                            </table>
+                            
+                            <input type="submit" class="button" value="Sortiraj" />
+                        </form>
+                    </div>
+                </div>
+                </div>
+            </div>
+                <br />
+            </div>
+</body>
+</html>

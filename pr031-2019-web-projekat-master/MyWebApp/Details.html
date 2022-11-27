@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            loadFitness();
+            loadTreninzi();
+            loadKomentari();
+
+
+            function loadFitness() {
+                $.ajax({
+                    url: "/api/details/DetailsFC",
+                    type: "GET",
+                    success: function (data) {
+                        tabela(data);
+                    }
+                });
+            }
+            function loadTreninzi() {
+                $.ajax({
+                    url: "/api/treninzi/get",
+                    type: "GET",
+                    success: function (data) {
+                        tabelaTreninzi(data);
+                    }
+                });
+            }
+            function loadKomentari() {
+                $.ajax({
+                    url: "/api/komentar/get",
+                    type: "GET",
+                    success: function (data) {
+                        komentari(data);
+                    }
+                });
+            }
+
+            function tabela(data) {
+
+                let table = '<table border="1" class="tFC">';
+                let item = '<tr><td>Naziv</td><td>' + data.Naziv + '</td></tr>';
+                item += '<tr><td>Adresa</td><td>' + data.Adresa + '</td></tr>';
+                item += '<tr><td>Godina otvaranja</td><td>' + data.GodinaOtvaranja + '</td></tr>';
+                item += '<tr><td>Vlasnik</td><td>' + data.Vlasnik + '</td></tr>';
+                item += '<tr><td>Cena mesecne clanarine</td><td>' + data.CenaMesecneClanarine + '</td></tr>';
+                item += '<tr><td>Cena godisnje clanarine</td><td>' + data.CenaGodisnjeClanarine + '</td></tr>';
+                item += '<tr><td>Cena treninga</td><td>' + data.CenaTreninga + '</td></tr>';
+                item += '<tr><td>Cena grupnog treninga</td><td>' + data.CenaGrupnogTreninga + '</td></tr>';
+                item += '<tr><td>Cena personalnog treninga</td><td>' + data.CenaPersonalnogTreninga + '</td</tr>';
+                table += item;
+                table += '</table>';
+                $('#content').html(table);
+            }
+
+            function tabelaTreninzi(data) {
+                let table;
+
+
+                if (data.length == 0) {
+                    table = '<p>Nema planiranih treninga za naredni period!</p>';
+                } else {
+
+                    table = '<table border="1" class="tFC">';
+                    var type;
+                    var item = '<tr><td>Naziv</td><td>Tip</td><td>Trajanje</td><td>Datum i vreme</td><td>Maksimalan broj posetilaca</td><td>Broj prijavljenih</td>';
+                    item += '</tr>';
+
+                    for (element in data) {
+                        if (data[element].Tip == 0) {
+                            type = "YOGA";
+                        } else if (data[element].Tip == 1) {
+                            type = "LES MILLS TONE";
+                        } else if (data[element].Tip == 2) {
+                            type = "BODY PUMP"
+                        }
+
+                        var logged = Ulogovan();
+                        var typeUser = Uloga()
+                        if (logged == true && typeUser == '0') {
+
+                            item += '<tr><td>' + data[element].Naziv + '</td><td>' + type + '</td><td>' + data[element].Trajanje + '</td><td>' + data[element].DatumVreme + '</td><td>' + data[element].MaksimalanBrPosetilaca + '</td><td>' + data[element].Posetioci.length + '</td><td><button id="prijavise" class="btnDetails" name="' + data[element].Id + '">Prijavi se</button></td></tr>';
+                        }
+                        else {
+                            item += '<tr><td>' + data[element].Naziv + '</td><td>' + type + '</td><td>' + data[element].Trajanje + '</td><td>' + data[element].DatumVreme + '</td><td>' + data[element].MaksimalanBrPosetilaca + '</td><td>' + data[element].Posetioci.length + '</td></tr>';
+                        }
+                    }
+                    table += item;
+
+                    table += '</table>';
+                }
+                $('#treninzi').html(table);
+            }
+
+            function Ulogovan() {
+                var o
+                $.ajax({
+                    url: "/api/Islogged",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        o = data
+                    }
+
+                });
+                return o;
+            }
+
+            function Uloga() {
+                var o
+                $.ajax({
+                    url: "/api/uloga",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        o = data
+                    }
+                });
+                return o;
+            }
+
+            $(document).on('click', '#prijavise', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "POST",
+                    url: "/api/treningprijava",
+                    data: { value: id }, 
+                    success: function (data) {
+                        if (data == true) {
+                            alert("Uspesno ste se prijavili na trening!");
+                            generateTableForGroupTrainings(data);
+                        } else {
+                            alert("Neuspesno prijavljivanje na trening!");
+                        }
+                    }
+                });
+            });
+
+            function komentari(data) {
+                let tableOfFC
+                if (data.length == 0)
+                    tableOfFC = '<p>Jos uvek nema komentara!</p>';
+                else {
+                    tableOfFC = '<table border="1" class="tFC">';
+                    tableOfFC += '<tr><th>Autor komentara</th><th>Tekst komentara</th><th>Ocena</th></tr>';
+                    for (element in data) {
+                        let fc = '<td>' + data[element].AutorKomentara + '</td>';
+                        fc += '<td>' + data[element].TekstKomentara + '</td>';
+                        fc += '<td>' + data[element].Ocena + '</td>';
+                        tableOfFC += '<tr>' + fc + '</tr>';
+                    }
+                    tableOfFC += '</table>';
+                }
+                $('#komentari').html(tableOfFC);
+            }
+
+
+        });
+
+    </script>
+    <style>
+        #tFC {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Detalji o fitnes centru</h1>
+    <div id="content"></div>
+    <hr />
+    <h3>Predstojeći treninzi</h3>
+    <div id="treninzi"></div>
+    <hr />
+    
+
+    <h3>Komentari</h3>
+    <div id="komentari"></div>
+
+</body>
+</html>

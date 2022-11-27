@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            loadTreneri();
+
+            function loadTreneri() {
+                $.ajax({
+                    url: "/api/treneri",
+                    type: "GET",
+                    success: function (data) {
+                        tabela(data);
+                    }
+                });
+            }
+
+            $(document).on('click', '.btnBlokiraj', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "DELETE",
+                    url: "/api/blokiranjetrenera",
+                    data: { value: id }, 
+                    success: function (data) {
+                        if (data == true) {
+                            alert("Uspešno ste blokirali trenera!");
+                            window.location = "/FCentri.html";
+                        } else {
+                            alert("Neuspešno blokiranje trenera!");
+                        }
+
+
+                    }, error: function (data) {
+                        alert("Neuspešno blokiranje!");
+                        // window.location = "/TrenerPregled.html";
+                    }
+                });
+                // window.location = "/details.html";
+            });
+
+
+            function tabela(data) {
+                let table;
+
+                if (data.length == 0) {
+                    table = '<p>Nema trenera koji rade u fitnes centru!</p>';
+                } else {
+
+                    table = '<table border="1" class="tFC">';
+                    var type;
+                    var item = '<tr><td>Korisničko ime</td><td>Ime</td><td>Prezime</td>';
+                    item += '</tr>';
+
+                    for (element in data) {
+                        item += '<tr><td>' + data[element].KorisnickoIme + '</td><td>' + data[element].Ime + '</td><td>' + data[element].Prezime + '</td>' + '<td><button id="blokiraj" class="btnBlokiraj" name="' + data[element].Id + '">Blokiraj</button></td></tr>';
+                    }
+                    table += item;
+
+                    table += '</table>';
+                }
+                $('#treneri').html(table);
+            }
+
+            
+
+        });
+
+    </script>
+    <style>
+        #tFC {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h3>Treneri u fitnes centru</h3>
+    <div id="treneri"></div>
+</body>
+</html>

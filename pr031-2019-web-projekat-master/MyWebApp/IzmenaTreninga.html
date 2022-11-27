@@ -1,0 +1,125 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+      
+
+            loadTrening();
+            function loadTrening() {
+                $.ajax({
+                    url: "/api/pregledtreninga/DetailsGT",
+                    type: "GET",
+                    success: function (data) {
+                        tabela(data);
+                    }
+                });
+            }
+            function tabela(data) {
+                let table;
+                table = '<form id="formChange"><table border="1">';
+                let item;
+                let tip
+                /*if (data.Tip == 0)
+                    tip = "YOGA"
+                else if (data.Tip == 1)
+                    tip = "LES MILLS TONE"
+                else
+                    tip = "BODY PUMP"*/
+                item = '<tr><td>Naziv</td><td><input type="text" value="' + data.Naziv + '" name="Naziv" id="Naziv"></td></tr>';
+                //item += '<tr><td>Tip</td><td><input type ></td></tr>'
+                if (data.Tip == 0) {
+                    item += '<tr><td>Tip</td><td><select id="tip"><option>' + 'YOGA' + '</option>'
+                    item += '<option>LES MILLS TONE</option>';
+                    item += '<option>BODY PUMP</option></select></td></tr>';
+                }
+                else if (data.Tip == 1) {
+                    item += '<tr><td>Tip</td><td><select id="tip"><"><option>' + 'LES MILLS TONE' + '</option>'
+                    item += '<option>YOGA</option>';
+                    item += '<option>BODY PUMP</option></select></td></tr>';
+                }
+                else {
+                    item += '<tr><td>Tip</td><td><select id="tip"><"><option>' + 'BODY PUMP' + '</option>'
+                    item += '<option>YOGA</option>';
+                    item += '<option>LES MILLS TONE</option></select></td></tr>';
+                }
+                //item += '<tr><td>Fitnes centar</td><td><input type="text" value="' + data.FCentar.Naziv, data.FCentar.Adresa + '" name="name" id="name"></td></tr>';
+                item += '<tr><td>Trajanje</td><td><input type="text" value="' + data.Trajanje + '" name="Trajanje" id="Trajanje"></td></tr>';
+                item += '<tr><td>Datum i vreme</td><td><input type="text" value="' + data.DatumVreme + '" name="DatumVreme" id="datePicker"></td></tr>';
+                item += '<tr><td>MaksimalanBrPosetilaca</td><td><input type="text" value="' + data.MaksimalanBrPosetilaca + '" name="MaksimalanBrPosetilaca" id="MaksimalanBrPosetilaca"></td></tr>';
+                //item += '<tr><td>Id</td><td><input type="text" value="' + data.Id + '" readonly/></td></tr>';
+                //item += '<tr><th colspan="2"><input type="submit" value="Izmeni"></th></tr>'
+                item += '<tr><td colspan="2"><input type="submit" id="saveEdit" value="Sačuvaj izmene"/></td></tr>'
+                table += item;
+                table += '</table></form>';
+                $('#content').html(table);
+            }
+
+            $(document).on('click', '#saveEdit', function () {
+                var form = $("#formChange");
+                let n = $('#Naziv').val();
+                if (n.length == 0) {
+                    alert("Morate uneti naziv!");
+                    return;
+                }
+                let t = $('#Trajanje').val();
+                if (t.length == 0) {
+                    alert("Morate uneti trajanje!");
+                    return;
+                }
+                let d = $('#datePicker').val();
+                if (d.length == 0) {
+                    alert("Morate uneti datum i vreme!");
+                    return;
+                }
+                let mp = $('#MaksimalanBrPosetilaca').val();
+                if (mp.length == 0) {
+                    alert("Morate uneti maksimalan broj posetilaca!");
+                    return;
+                }
+                $.ajax({
+                    type: "PUT",
+                    url: "/api/pregledtreninga",
+                    async: false,
+                    data: form.serialize(),
+                    success: function (data) {
+                        alert("Trening je uspešno editovan!");
+                    }, error: function (data) {
+                        alert("Neuspešno editovanje treninga!");
+                    }
+                });
+                window.location = "/TrenerPregled.html";
+            })
+
+           /* $("#formChange").submit(function (e) {
+                e.preventDefault(); // avoid to execute the actual submit of the form.
+                let id = $(this).attr('name');
+                var form = $(this);
+                $.ajax({
+                    type: "PUT",
+                    url: "/api/edittrening",
+                    async:false,
+                    data: form.serialize(), // serializes the form's elements.
+                    success: function (data) {
+                        alert("Uspesno ste izmenili!");
+                        generateTableTrainings(data);
+                    }, error: function (data) {
+                        alert("Neuspesna izmena!");
+                    }
+                });
+            });*/
+
+
+        });</script>
+</head>
+<body>
+    <h1>Izmena treninga</h1>
+    <div id="content"></div>
+</body>
+</html>

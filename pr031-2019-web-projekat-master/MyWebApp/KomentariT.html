@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            loadKomentari();
+
+
+            function loadKomentari() {
+                $.ajax({
+                    url: "/api/komentarit",
+                    type: "GET",
+                    success: function (data) {
+                        komentari(data);
+                    }
+                });
+            }
+
+
+
+            $(document).on('click', '.btnOdbij', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "POST",
+                    url: "/api/odbij",
+                    data: { value: id }, 
+                    success: function (data) {
+                        //odbijeniK(data);
+                    }
+                });
+                window.location = "/OdbijeniK.html";
+            });
+
+            $(document).on('click', '.btnOdobri', function () {
+                alert("kdn")
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "POST",
+                    url: "/api/odobri",
+                    data: { value: id }, 
+                    success: function (data) {
+                        alert("Komentar je odobren!")
+                        //odbijeniK(data);
+                    }
+                });
+                window.location = "/Index.html";
+            });
+
+            function komentari(data) {
+                let tableOfFC
+                if (data.length == 0)
+                    tableOfFC = '<p>Jos uvek nema komentara!</p>';
+                else {
+                    tableOfFC = '<table border="1" class="tFC">';
+                    tableOfFC += '<tr><th>Autor komentara</th><th>Tekst komentara</th><th>Ocena</th></tr>';
+                    for (element in data) {
+                        let fc = '<td>' + data[element].AutorKomentara + '</td>';
+                        fc += '<td>' + data[element].TekstKomentara + '</td>';
+                        fc += '<td>' + data[element].Ocena + '</td>';
+                        //fc += '<td><button class="btnOdobri" name="' + data[element].Id + '">Odobri</button></td>';
+                        fc += '<td><button class="btnOdbij" name="' + data[element].Id + '">Odbij</button></td>';
+                        fc += '<td><button class="btnOdobri" name="' + data[element].Id + '">Odobri</button></td>';
+                        tableOfFC += '<tr>' + fc + '</tr>';
+                    }
+                    tableOfFC += '</table>';
+                }
+                $('#komentari').html(tableOfFC);
+            }
+
+
+
+
+        });
+
+    </script>
+    <style>
+        #tFC {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Komentari</h1>
+    <div id="komentari"></div>
+    <a href="/OdbijeniK.html">Odbijeni komentari</a>
+</body>
+</html>

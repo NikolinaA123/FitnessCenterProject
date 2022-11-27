@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            loadInfo();
+            function loadInfo() {
+                $.ajax({
+                    url: "/api/editfc",
+                    type: "GET",
+                    success: function (data) {
+                        tabela(data);
+                    }
+                });
+            }
+
+           /*$("#formIzmena").submit(function (e) {
+               e.preventDefault();
+               var form = $(this);
+               alert("bfhdyh")
+                $.ajax({
+                    type: "PUT",
+                    url: "/api/editfc",
+                    async: false,
+                    data: form.serialize(),
+                    success: function (data) {
+                        alert("Fitnes centar je uspesno editovan!");
+                    }, error: function (data) {
+                        alert("Neuspesno editovanje fitnes centra!");
+                    }
+                });
+           });*/
+            $(document).on('click', '#saveEdit', function () {
+                var form = $("#formIzmena");
+               /* let n = $('#n').val();
+                if (n.length == 0) {
+                    alert("Morate uneti naziv!");
+                    return;
+                }
+                let n = $('#a').val();
+                if (n.length == 0) {
+                    alert("Morate uneti adresu!");
+                    return;
+                }
+                let n = $('#g').val();
+                if (n.length == 0) {
+                    alert("Morate uneti godinu!");
+                    return;
+                }
+                let n = $('#mc').val();
+                if (n.length == 0) {
+                    alert("Morate uneti mesecnu!");
+                    return;
+                }
+                let n = $('#gc').val();
+                if (n.length == 0) {
+                    alert("Morate uneti godisnju!");
+                    return;
+                }
+                let n = $('#tr').val();
+                if (n.length == 0) {
+                    alert("Morate uneti cenu treninga!");
+                    return;
+                }
+                let n = $('#gr').val();
+                if (n.length == 0) {
+                    alert("Morate uneti cenu grupnog!");
+                    return;
+                }
+                let n = $('#per').val();
+                if (n.length == 0) {
+                    alert("Morate uneti cenu personalnog!");
+                    return;
+                }*/
+                $.ajax({
+                    type: "PUT",
+                    url: "/api/editfc",
+                    async: false,
+                    data: form.serialize(),
+                    success: function (data) {
+                        alert("Fitnes centar je uspešno editovan!");
+                    }, error: function (data) {
+                        alert("Neuspešno editovanje fitnes centra!");
+                    }
+                });
+            })
+
+
+
+
+
+            function tabela(data) {
+                let table = '<form id="formIzmena">';
+                let item = '<table>';
+                item += '<tr><td>Naziv</td><td><input type="text" id="n" name="naziv" value="' + data.Naziv + '" /></td></tr>';
+                item += '<tr><td>Adresa</td><td><input type="text" id="a" name="adresa" value="' + data.Adresa + '"/></td></tr>';
+                item += '<tr><td>Godina otvaranja</td><td><input type="number" id="g" name="godina" value="' + data.GodinaOtvaranja + '"/></td></tr>';
+                item += '<tr><td>Cena mesečne članarine</td><td><input type="number" id="mc" name="mesecna" value="' + data.CenaMesecneClanarine + '"/></td></tr>';
+                item += '<tr><td>Cena godišnje članarine</td><td><input type="number" id="gc" name="godisnja" value="' + data.CenaGodisnjeClanarine + '"/></td></tr>';
+                item += '<tr><td>Cena treninga</td><td><input type="number" name="trening" id="tr" value="' + data.CenaTreninga + '"/></td></tr>';
+                item += '<tr><td>Cena grupnog treninga</td><td><input type="number" name="grupni" id="gr" value="' + data.CenaGrupnogTreninga + '"/></td></tr>';
+                item += '<tr><td>Cena personalnog treninga</td><td><input type="number" name="personalni" id="per" value="' + data.CenaPersonalnogTreninga + '"/></td></tr>';
+                item +=  '<tr><td colspan="2"><input type="submit" id="saveEdit" value="Sačuvaj izmene"/></td></tr></table>'
+                //item += '<tr><td colspan="2"><input type="submit" id="saveEdit" value="Sačuvaj izmene"/></td></tr></table>'
+                table += item
+                table += '</form>';
+                $('#content').html(table);
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Modifikovanje fitnes centra</h1>
+    <div id="content"></div>
+    <a href="FCentri.html">Nazad</a>
+</body>
+</html>

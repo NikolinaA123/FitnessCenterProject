@@ -1,0 +1,267 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            //loadInfo();
+            loadFC();
+            
+
+            function loadFC(idKorisnika) {
+                $.ajax({
+                    url: "/api/vlasnikfc",
+                    type: "GET",
+                    success: function (data) {
+                        tabela(data);
+                    }
+                });
+            }
+
+            $(document).on('click', '.btnRegister', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "GET",
+                    url: "/api/dodajtrenera",
+                    data: { value: id }, 
+                    success: function (data) {
+                        //gtabela(data);
+                    }
+                });
+                window.location = "/DodajTrenera.html";
+            });
+
+            $(document).on('click', '.btnEdit', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "POST",
+                    url: "/api/editfc",
+                    data: { value: id },
+                    success: function (data) {
+                        //gtabela(data);
+                    }
+                });
+                window.location = "/EditFC.html";
+            });
+
+            $(document).on('click', '.btnTreneri', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "POST",
+                    url: "/api/treneri",
+                    data: { value: id }, 
+                    success: function (data) {
+                        //gtabela(data);
+                    }
+                });
+                window.location = "/Treneri.html";
+            });
+
+            $(document).on('click', '.btnKomentari', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "POST",
+                    url: "/api/komentarit",
+                    data: { value: id }, 
+                    success: function (data) {
+                        //gtabela(data);
+                    }
+                });
+                window.location = "/KomentariT.html";
+            });
+
+            $(document).on('click', '.btnPregledaj', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "POST",
+                    url: "/api/details",
+                    data: { value: id }, 
+                    success: function (data) {
+                        //gtabela(data);
+                    }
+                });
+                window.location = "/details.html";
+            });
+
+            $(document).on('click', '.btnBrisanje', function () {
+                let id = $(this).attr('name');
+                $.ajax({
+                    type: "DELETE",
+                    url: "/api/brisanjefc",
+                    data: { value: id }, 
+                    success: function (data) {
+                        if (data == true) {
+                            alert("Uspešno ste obrisali fitnes centar!");
+                            window.location = "/FCentri.html";
+                        } else {
+                            alert("Ne možete da izbrišete fitnes centar jer ima planiranih treninga!");
+                        }
+
+
+                    }, error: function (data) {
+                        alert("Neuspešno brisanje!");
+                        // window.location = "/TrenerPregled.html";
+                    }
+                });
+                // window.location = "/details.html";
+            });
+
+            
+            function tabela(data) {
+                let tableOfFC = '<table class="tFC" border="1">';
+                tableOfFC += '<tr><th>Naziv</th><th>Adresa</th><th>Godina otvaranja</th></tr>';
+                for (element in data) {
+                    let fc = '<td>' + data[element].Naziv + '</td>';
+                    fc += '<td>' + data[element].Adresa + '</td>';
+                    fc += '<td>' + data[element].GodinaOtvaranja + '</td>';
+                    fc += '<td><button class="btnRegister" name="' + data[element].Id + '">Registruj trenera</button></td>';
+                    fc += '<td><button class="btnEdit" name="' + data[element].Id + '">Modifikuj centar</button></td>';
+                    fc += '<td><button class="btnPregledaj" name="' + data[element].Id + '">Pregledaj centar</button></td>';
+                    fc += '<td><button class="btnBrisanje" name="' + data[element].Id + '">Izbriši centar</button></td>';
+                    fc += '<td><button class="btnTreneri" name="' + data[element].Id + '">Treneri</button></td>';
+                    fc += '<td><button class="btnKomentari" name="' + data[element].Id + '">Komentari</button></td>';
+                    tableOfFC += '<tr>' + fc + '</tr>';
+                }
+                tableOfFC += '</table>';
+                $('#fcentri').html(tableOfFC);
+            }
+
+            function Ulogovan() {
+                var o
+                $.ajax({
+                    url: "/api/Islogged",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        o = data
+                    }
+
+                });
+                return o;
+            }
+
+            function Uloga() {
+                var o
+                $.ajax({
+                    url: "/api/uloga",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        o = data
+                    }
+                });
+                return o;
+            }
+
+            function KorisnickoIme() {
+                var ki
+                $.ajax({
+                    url: "/api/ulogovankorisnik",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        ki = data
+                    }
+                });
+                return ki;
+            }
+
+            $("#formDodaj").submit(function (e) {
+                e.preventDefault(); 
+                var form = $(this);
+                $.ajax({
+                    type: "POST",
+                    url: "/api/dodajfc",
+                    async: false,
+                    data: form.serialize(), 
+                    success: function (data) {
+                        alert("Uspešno ste dodali fitnes centar!");
+                        window.location = "/FCentri.html";
+                    }, error: function (data) {
+                        alert("Neuspešno dodavanje fitnes centra!");
+                        window.location = "/FCentri.html";
+                    }
+                });
+            });
+
+        });
+    </script>
+    <style>
+        #tFC {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 3px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h3>Fitnes centri</h3>
+    <div id="fcentri"></div>
+    <hr />
+    <h3>Dodaj fitnes centar</h3>
+    <form id="formDodaj">
+        <table>
+            <tr>
+                <td>Naziv</td>
+                <td><input type="text" name="naziv" /></td>
+            </tr>
+            <tr>
+                <td>Ulica</td>
+                <td><input type="text" name="ulica" /></td>
+            </tr>
+            <tr>
+                <td>Broj</td>
+                <td><input type="number" name="broj" /></td>
+            </tr>
+            <tr>
+                <td>Grad</td>
+                <td><input type="text" name="grad" /></td>
+            </tr>
+            <tr>
+                <td>Poštanski broj</td>
+                <td><input type="number" name="pbroj" /></td>
+            </tr>
+            <tr>
+                <td>Godina otvaranja</td>
+                <td><input type="number" name="godina" /></td>
+            </tr>
+            <tr>
+                <td>Cena mesečne članarine</td>
+                <td><input type="number" name="mesecna" /></td>
+            </tr>
+            <tr>
+                <td>Cena godišnje članarine</td>
+                <td><input type="number" name="godisnja" /></td>
+            </tr>
+            <tr>
+                <td>Cena treninga</td>
+                <td><input type="number" name="trening" /></td>
+            </tr>
+            <tr>
+                <td>Cena grupnog treninga</td>
+                <td><input type="number" name="grupni" /></td>
+            </tr>
+            <tr>
+                <td>Cena personalnog treninga</td>
+                <td><input type="number" name="personalni" /></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="submit" value="Dodaj"/></td>
+            </tr>
+        </table>
+    </form>
+    <hr />
+    <a href="/Index.html">Početna</a>
+</body>
+</html>
